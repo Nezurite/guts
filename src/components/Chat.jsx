@@ -1,24 +1,39 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Message from './Message';
+import { useChatStore } from '../lib/chatStore';
 
-export default function Chat() {
-  const [messages, setMessages] = useState([
-    { text: 'Hello! How can I help you today?', isUser: false },
-    { text: 'Hey, what’s the weather like?', isUser: true },
-  ]);
+export default function Chat({ activeChat }) {
   const [input, setInput] = useState('');
+  const { getChats, addMessage } = useChatStore();
+  const [messages, setMessages] = useState([]);
+
+  useEffect(() => {
+    if (activeChat) {
+      const chat = getChats().find(c => c.id === activeChat);
+      setMessages(chat?.messages || []);
+    }
+  }, [activeChat]);
 
   const handleSend = () => {
-    if (!input.trim()) return;
-    setMessages([...messages, { text: input, isUser: true }]);
+    if (!input.trim() || !activeChat) return;
+    
+    const newMessage = {
+      id: Date.now().toString(),
+      text: input,
+      isUser: true,
+      timestamp: new Date().toISOString()
+    };
+
+    addMessage(activeChat, newMessage);
+    setMessages([...messages, newMessage]);
     setInput('');
   };
 
   return (
     <div className="chat-container">
       <div className="messages">
-        {messages.map((msg, i) => (
-          <Message key={i} text={msg.text} isUser={msg.isUser} />
+        {messages.map((msg) => (
+          <Message key={msg.id} text={msg.text} isUser={msg.isUser} />
         ))}
       </div>
       <div className="input-area">
