@@ -9,9 +9,11 @@ export default function Sidebar() {
         </button>
       </div>
       <div className="chat-history">
-        <div className="chat-item">
-          <FiMessageSquare /> What is AI?
-        </div>
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="chat-item">
+            <FiMessageSquare /> Chat {i + 1}
+          </div>
+        ))}
       </div>
       <div className="sidebar-footer">
         <button className="settings-btn">
